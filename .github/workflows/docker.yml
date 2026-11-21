@@ -26,7 +26,7 @@ jobs:
 
         - name: Build Docker Image
           id: buildAndPushImage
-          uses: welidnl/cicd-docker-image@v1.0
+          uses: welidnl/cicd-docker-image@main
           with:
             registry_url: 'docker.io'
             repository_name: 'workflow-repo'
