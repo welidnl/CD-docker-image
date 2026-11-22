@@ -1,0 +1,4 @@
+node_modules/
+cicd/
+cicd-linting/
+custom-actions/
