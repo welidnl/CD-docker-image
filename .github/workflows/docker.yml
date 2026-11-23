@@ -27,7 +27,7 @@ jobs:
         - name: Build and push
           uses: docker/build-push-action@v6
           with:
-            context: app_flask
+            context: app_node
             push: true
             tags: ${{ secrets.DOCKERHUB_USERNAME }}/workflow-repo:v1.0
 

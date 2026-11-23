@@ -1,6 +1,6 @@
-# cicd-docker-image
+# CD-docker-image
 
-This is a Workflow I built that demonstrates how you can use Continuous Integration and Continuous Deployment to build and push an Image to a container registry (in this case Docker Hub). 
+This is a Workflow I built that demonstrates how you can use Continuous Deployment to build and push an Image to a container registry (in this case Docker Hub). 
 
 ## What the Project Does:
 
@@ -16,30 +16,59 @@ Whenever code is pushed to the main branch an automated workflow runs to:
 ├── .github/
 │   └── workflows/
 │       └── docker.yml      # CI/CD workflow
-├── app_flask/
+├── app_node/
 │   ├── Dockerfile          # Image definition
 │   └── rock-game.js        # Rock, Paper, Scissors app
 └── README.md
 ```
 
-## How the Workflow Works:
+### Continuous Delivery (CD)
 
-1. **Checkout**: pulls the repository code onto the runner.
-2. **Set up Node**: installs Node 20.
-3. **Log in to Docker Hub**: authenticates using repository secrets.
-4. **Build and push**: builds the image from `app_flask/` and pushes it to Docker Hub.
+The workflow lives at `.github/workflows/docker.yml` and runs as a single `build` job on an `ubuntu-latest` runner.
 
-## Required Secrets:
+**Triggers**
+- Every push to the `main` branch
+- Manually, using `workflow_dispatch` from the Actions tab
 
-Add these under **Settings → Secrets and variables → Actions**:
+**Steps:**
 
-## Running the Image Locally:
+1. **Checkout code** (`actions/checkout@v7`) clones the repository onto the runner so the Dockerfile and app source are available.
+2. **Set up Node.js** (`actions/setup-node@v4`) installs Node 20 on the runner.
+3. **Log in to Docker Hub** (`docker/login-action@v3`) authenticates using the `DOCKERHUB_USERNAME` and `DOCKERHUB_PAT` secrets, so no credentials are stored in the repository.
+4. **Build and push** (`docker/build-push-action@v6`) builds the image using `app_node` as the build context and pushes it to Docker Hub as `welidnl/workflow-repo:v1.0`.
+
+**The Docker image**
+
+The `Dockerfile` in `app_node/` uses `node:20-slim` as the base image, copies `rock-game.js` into `/rock-game`, and runs it with `node rock-game.js` when the container starts.
+
+**Secrets:**
+
+Add these under *Settings → Secrets and variables → Actions*:
+
+| Secret | Purpose |
+|--------|---------|
+| `DOCKERHUB_USERNAME` | Docker Hub account name |
+| `DOCKERHUB_PAT` | Docker Hub personal access token (create one under Account Settings → Personal access tokens) |
+
+### Running the Image
 
 ```bash
 docker pull welidnl/workflow-repo:v1.0
-docker run --rm welidnl/workflow-repo:v1.0
+docker run  welidnl/workflow-repo:v1.0
 ```
+
+### Screenshots
+
+**Successful GitHub Actions run**
+
+![GitHub Actions run](images/actions-run.png)
+
+**Image published on Docker Hub**
+
+![Docker Hub repository](images/dockerhub-repo.png)
+
 
 ## Technologies used:
 
 GitHub Actions, Docker, Docker Hub, Node.js
+
